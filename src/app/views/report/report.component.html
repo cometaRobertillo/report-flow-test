@@ -1,1 +1,65 @@
-<p>report works!</p>
+<div class="main">
+    <div class="filters">
+        <form [formGroup]="filters" (submit)="addReport()">
+            <mat-form-field>
+                <mat-label>Select a Type</mat-label>
+                <mat-select formControlName="type">
+                    <mat-option [value]="1">
+                        MONTHLY
+                    </mat-option>
+                    <mat-option [value]="2">
+                        QUARTERLY
+                    </mat-option>
+                </mat-select>
+                @if (filters.controls['type'].hasError('required')) {
+                    <mat-error>Type is <strong>required</strong></mat-error>
+                }
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Processing Day</mat-label>
+                <input matInput formControlName="day" type="number"/>
+                @if (filters.controls['day'].hasError('required')) {
+                    <mat-error>Day is <strong>required</strong></mat-error>
+                }
+                @if (filters.controls['day'].hasError('min') || filters.controls['day'].hasError('max')) {
+                    <mat-error>Day is <strong>out of range</strong></mat-error>
+                }
+            </mat-form-field>
+            <button mat-button type="submit">Submit</button>
+        </form>
+    </div>
+    <div class="content">
+        <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+
+            <!--- Note that these columns can be defined in any order.
+                  The actual rendered columns are set as a property on the row definition" -->
+          
+            <!-- Position Column -->
+            <ng-container matColumnDef="request_date">
+              <th mat-header-cell *matHeaderCellDef> Request Date </th>
+              <td mat-cell *matCellDef="let element"> {{element.request_date}} </td>
+            </ng-container>
+          
+            <!-- Name Column -->
+            <ng-container matColumnDef="type">
+              <th mat-header-cell *matHeaderCellDef> Type </th>
+              <td mat-cell *matCellDef="let element"> {{element.type}} </td>
+            </ng-container>
+          
+            <!-- Weight Column -->
+            <ng-container matColumnDef="processing_day">
+              <th mat-header-cell *matHeaderCellDef> Processing Day </th>
+              <td mat-cell *matCellDef="let element"> {{element.processing_day}} </td>
+            </ng-container>
+          
+            <!-- Symbol Column -->
+            <ng-container matColumnDef="processing_date">
+              <th mat-header-cell *matHeaderCellDef> Processing Date </th>
+              <td mat-cell *matCellDef="let element"> {{element.processing_date}} </td>
+            </ng-container>
+          
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+    </div>
+</div>

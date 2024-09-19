@@ -1,0 +1,24 @@
+.main {
+    padding: 18px 27px;
+    width: calc(100% - 54px);
+    height: calc(100dvh - 36px);
+    background-color: #383838;
+
+    .filters {
+        form {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            align-items: center;
+
+            mat-form-field {
+                width: 47%;
+            }
+        }
+    }
+
+    .content {
+        padding-top: 13px;
+    }
+}

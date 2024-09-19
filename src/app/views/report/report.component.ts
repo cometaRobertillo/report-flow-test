@@ -5,11 +5,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatTableModule } from '@angular/material/table';
-
-const ELEMENT_DATA: any[] = [
-  {request_date: '2024-19-09', type: 'MONTHLY', processing_day: 15, processing_date: '2024-10-15'},
-  {request_date: '2024-19-09', type: 'QUARTERLY', processing_day: 15, processing_date: '2024-10-15'},
-];
+import moment from 'moment';
+import IReport from '../../shared/interfaces/report';
 
 @Component({
   selector: 'app-report',
@@ -28,21 +25,62 @@ const ELEMENT_DATA: any[] = [
 export class ReportComponent {
   
   public displayedColumns: string[] = ['request_date', 'type', 'processing_day', 'processing_date'];
-  public dataSource = ELEMENT_DATA;
-  public filters: FormGroup;
+  public dataSource: IReport[] = [];
+  public formData: FormGroup;
 
   constructor(private formBuilder: FormBuilder) {
-    this.filters = this.formBuilder.group({
+    this.formData = this.formBuilder.group({
       type: ['', [Validators.required]],
       day: ['', [Validators.required,Validators.min(1), Validators.max(31)]]
-    })
+    });
   }
 
-  addReport() {
-    if (this.filters.valid) {
-      console.log(this.filters.value);
+  public addReport() {
+
+    if (!this.formData.valid) return;
+    const type = this.formData.value.type;
+    const day = this.formData.value.day;
+    const result = this.calculateDates(type, day);
+    const invalidDate = this.validateNonRepeat(result);
+    if(invalidDate) {
+      alert('Repeated report, select another day');
     } else {
-      console.log('invalid');
+      this.dataSource = [...this.dataSource, result];
+      this.resetForm();
     }
+  }
+
+  private calculateDates(type: number, day: number): IReport {
+    let request: string, processing: string;
+    if(type === 1 ) {
+      request = moment().format('YYYY-MM-DD');
+      processing = moment(request).add(1, 'months').date(day).format('YYYY-MM-DD');
+    } else {
+      request = moment().format('YYYY-MM-DD');
+      const quarter = moment(request).quarter();
+      processing = moment().quarter(quarter + 1).startOf('quarter').date(day).format('YYYY-MM-DD');
+    }
+
+    return {
+      request_date: request,
+      type: type === 1 ? 'MONTHLY' : 'QUARTERLY',
+      processing_day: day,
+      processing_date: processing
+    }
+  }
+
+  private resetForm() {
+    this.formData.reset();
+    for(let name in this.formData.controls) {
+      this.formData.controls[name].setErrors(null);
+    }
+  }
+
+  private validateNonRepeat(report: IReport) {
+    return this.dataSource.some(x => x.processing_date === report.processing_date && x.type === report.type);
+  }
+  
+  private validateMonths() {
+
   }
 }
